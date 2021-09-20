@@ -7,13 +7,14 @@ const env = process.env.WEBPACK_BUILD || process.env.NODE_ENV || 'development';
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
 
 const outputFilename = 'video-react';
-const minimizer = env === 'production' ? [new UglifyJsPlugin()] : [];
-const outputFile = env === 'production'
-  ? `${outputFilename.toLowerCase()}.min.js`
-  : `${outputFilename.toLowerCase()}.js`;
+const minimizer = env === 'production' ? [new TerserPlugin()] : [];
+const outputFile =
+  env === 'production'
+    ? `${outputFilename.toLowerCase()}.min.js`
+    : `${outputFilename.toLowerCase()}.js`;
 
 const paths = [
   '/',
@@ -41,25 +42,22 @@ const config = {
   mode: env,
   devtool: 'source-map',
   devServer: {
-    inline: false,
-    disableHostCheck: true,
-    contentBase: './build',
+    static: './build',
     historyApiFallback: true,
     host: '0.0.0.0',
-    port: 9000,
-    stats: {
-      chunks: false
-    }
+    port: 9000
   },
-  entry: ['@babel/polyfill', './docs/lib/app'],
-  node: {
-    fs: 'empty'
+  stats: {
+    chunks: false
   },
+  entry: ['core-js/stable', 'regenerator-runtime/runtime', './docs/lib/app'],
   output: {
+    publicPath: '',
     filename: 'bundle.js',
     path: path.resolve('./build'),
     libraryTarget: 'umd',
-    library: 'VideoReact'
+    library: 'VideoReact',
+    globalObject: `typeof self !== 'undefined' ? self : this`
   },
   plugins: [
     new CleanWebpackPlugin(['build']),
@@ -70,12 +68,12 @@ const config = {
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify(env)
     }),
-    new StaticSiteGeneratorPlugin({
-      paths,
-      globals: {
-        window: {}
-      }
-    }),
+    // new StaticSiteGeneratorPlugin({
+    //   paths,
+    //   globals: {
+    //     window: {}
+    //   }
+    // }),
     new MiniCssExtractPlugin({
       filename: 'assets/[name].css',
       chunkFilename: 'assets/[id].css'
@@ -102,10 +100,7 @@ const config = {
         test: /\.css$/,
         use: [
           {
-            loader: MiniCssExtractPlugin.loader,
-            options: {
-              publicPath: 'assets'
-            }
+            loader: MiniCssExtractPlugin.loader
           },
           'css-loader'
         ]
@@ -114,10 +109,7 @@ const config = {
         test: /\.scss$/,
         use: [
           {
-            loader: MiniCssExtractPlugin.loader,
-            options: {
-              publicPath: 'assets'
-            }
+            loader: MiniCssExtractPlugin.loader
           },
           'css-loader',
           'sass-loader'
@@ -162,7 +154,7 @@ const config = {
     modules: [path.resolve('./src'), 'node_modules']
   },
   optimization: {
-    noEmitOnErrors: true,
+    emitOnErrors: false,
     minimizer,
     splitChunks: {
       cacheGroups: {
