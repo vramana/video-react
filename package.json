@@ -1,6 +1,6 @@
 {
   "name": "@vramana/video-react",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Video-React is a web video player built from the ground up for an HTML5 world using React library.",
   "main": "lib/index.js",
   "style": "dist/video-react.css",
@@ -26,9 +26,9 @@
       "pre-commit": "lint-staged"
     }
   },
-"publishConfig": {
-	"access": "public"
-},
+  "publishConfig": {
+    "access": "public"
+  },
   "lint-staged": {
     "**/*.{js,css,md}": [
       "npm run format-one",
