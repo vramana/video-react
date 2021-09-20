@@ -26,6 +26,9 @@
       "pre-commit": "lint-staged"
     }
   },
+"publishConfig": {
+	"access": "public"
+},
   "lint-staged": {
     "**/*.{js,css,md}": [
       "npm run format-one",
