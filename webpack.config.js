@@ -1,6 +1,6 @@
 const path = require('path');
 const webpack = require('webpack');
-const StaticSiteGeneratorPlugin = require('static-site-generator-webpack-plugin');
+const StaticSiteGeneratorPlugin = require('@slorber/static-site-generator-webpack-plugin');
 
 const env = process.env.WEBPACK_BUILD || process.env.NODE_ENV || 'development';
 
@@ -68,12 +68,15 @@ const config = {
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify(env)
     }),
-    // new StaticSiteGeneratorPlugin({
-    //   paths,
-    //   globals: {
-    //     window: {}
-    //   }
-    // }),
+    new StaticSiteGeneratorPlugin({
+      paths,
+      globals: {
+        window: {},
+        self: {
+          addEventListener: () => {}
+        }
+      }
+    }),
     new MiniCssExtractPlugin({
       filename: 'assets/[name].css',
       chunkFilename: 'assets/[id].css'
